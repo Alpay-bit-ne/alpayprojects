@@ -452,7 +452,7 @@
     <div class="action-bar">
       <span class="char-count" id="charCount">0 karakter <span class="shortcut-hint">(Ctrl+Enter ile çevir)</span></span>
       <button class="copy-btn" id="copyBtn" onclick="copyOutput()" style="display:none">Kopyala</button>
-      <button class="translate-btn" id="translateBtn" onclick="translate()">Çevir →</button>
+      <button class="translate-btn" id="translateBtn" onclick="doTranslate()">Çevir →</button>
     </div>
   </div>
 
@@ -519,10 +519,10 @@
     updateLangUI();
     document.getElementById('sourceText').value = text;
     updateCount();
-    setTimeout(() => translate(), 100);
+    setTimeout(() => doTranslate(), 100);
   }
 
-  async function translate() {
+  async function doTranslate() {
     const text = document.getElementById('sourceText').value.trim();
     if (!text) {
       document.getElementById('sourceText').focus();
@@ -588,7 +588,7 @@
   document.getElementById('sourceText').addEventListener('keydown', function(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault();
-      translate();
+      doTranslate();
     }
   });
 </script>
