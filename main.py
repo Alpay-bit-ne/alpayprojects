@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-import httpx
+from deep_translator import GoogleTranslator
 
 app = FastAPI()
 
@@ -16,27 +16,17 @@ LANG_MAP = {
 async def translate(request: Request):
     try:
         data = await request.json()
-        text   = data.get("text", "")
+        text = (data.get("text") or "").strip()
         source = LANG_MAP.get(data.get("source", ""), "de")
         target = LANG_MAP.get(data.get("target", ""), "tr")
 
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.get(
-                "https://api.mymemory.translated.net/get",
-                params={
-                    "q": text,
-                    "langpair": f"{source}|{target}"
-                }
-            )
+        if not text:
+            return JSONResponse({"result": ""})
 
-        if response.status_code == 200:
-            translated = response.json().get("responseData", {}).get("translatedText", "Çeviri alınamadı.")
-            return {"result": translated}
-        else:
-            return JSONResponse({"result": f"Hata: {response.status_code}"})
+        translated = GoogleTranslator(source=source, target=target).translate(text)
+        return {"result": translated or "Çeviri alınamadı."}
 
     except Exception as e:
         return JSONResponse({"result": f"Hata: {str(e)}"})
-
 
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
