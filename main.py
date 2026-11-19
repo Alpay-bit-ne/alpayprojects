@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from deep_translator import GoogleTranslator
+from deep_translator import GoogleTranslator, MyMemoryTranslator
 
 app = FastAPI()
 
@@ -23,9 +23,20 @@ async def translate(request: Request):
         if not text:
             return JSONResponse({"result": ""})
 
+        try:
+            translated = MyMemoryTranslator(source=source, target=target).translate(text)
+            if translated and "MYMEMORY WARNING" not in translated.upper():
+                return {"result": translated}
+        except Exception:
+            pass
+
         translated = GoogleTranslator(source=source, target=target).translate(text)
         return {"result": translated or "Çeviri alınamadı."}
 
+    except Exception as e:
+        return JSONResponse({"result": f"Hata: {str(e)}"})
+
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
     except Exception as e:
         return JSONResponse({"result": f"Hata: {str(e)}"})
 
