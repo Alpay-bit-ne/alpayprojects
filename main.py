@@ -12,6 +12,7 @@ LANG_MAP = {
     "Turkish": "tr",
 }
 
+
 @app.post("/translate")
 async def translate(request: Request):
     try:
@@ -36,8 +37,5 @@ async def translate(request: Request):
     except Exception as e:
         return JSONResponse({"result": f"Hata: {str(e)}"})
 
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
-    except Exception as e:
-        return JSONResponse({"result": f"Hata: {str(e)}"})
 
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
